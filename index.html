@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+    
+  
+<div class="container">
+  <h1 class="text-center">TODO APP</h1> 
+  <div>
+      <form method="post" action="http://localhost:3000/todo">
+          <textarea placeholder="Enter Notes" name="note" class="form-control" rows="5"></textarea>
+          <input type="submit" class="btn btn-primary" style="float: right;" value="Add">
+      </form>
+      <button onclick="getData()"  class="btn btn-success">View Todo List</button>
+      <div id="results">
+        
+      </div>
+  </div>         
+</div>
+
+  <script>
+    var arr = [];
+    function getData(){
+      fetch("http://localhost:3000/todo")
+      .then(res => res.json())
+      .then(function(data){
+        var d = data;
+        var str = "<ul>"
+        for(var i = 0;i<d.length;i++){
+          if(d[i].status === "N")
+            str += "<li>"+ d[i].note +"<a onclick='completed("+ d[i].id +")'>Completed</a><a onclick='del("+ d[i].id +")'>Delete</a></li>";
+          else
+          str += "<li><strike>"+ d[i].note +"</strike><a onclick='del("+ d[i].id +")'>Delete</a></li>";  
+        }
+        str += "</ul>"
+        document.getElementById("results").innerHTML = str;
+      });
+    }
+    function del(id){
+      alert("del" + id);
+      fetch("http://localhost:3000/todo/"+id,{
+        method:"DELETE"
+      })
+      .then(res => res.json())
+      .then(result => {console.log(result), getData()})
+    }
+    function completed(id){
+      alert(id);
+      fetch("http://localhost:3000/todo/"+id,{
+        method:"PUT"
+      })
+      .then(res => res.json())
+      .then(result => {console.log(result), getData()})
+    }
+    
+  </script>
+</body>
+</html>
